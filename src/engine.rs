@@ -1,3 +1,4 @@
+use kiss3d::scene::SceneNode;
 pub use kiss3d::nalgebra::Vector3;
 
 #[derive(Clone)]
@@ -53,7 +54,7 @@ pub fn integrate(state: &mut LinearState, t: f64, dt: f64) -> Vector3<f64> {
 	c = eval(state, t, dt*0.5, &b);
 	d = eval(state, t, dt, &c);
 
-	let dxdt = 1.0 / 6.0* (a.velocity + 2.0 * (b.velocity + c.velocity) + d.velocity);
+	let dxdt = 1.0 / 6.0 * (a.velocity + 2.0 * (b.velocity + c.velocity) + d.velocity);
 	let dvdt = 1.0 / 6.0 * (state.momentum/state.mass + 2.0 * (state.momentum/state.mass + state.momentum/state.mass) + state.momentum/state.mass);
 	let dmdt = 1.0 / 6.0* (a.force + 2.0 * (b.force + c.force) + d.force);
 
@@ -63,3 +64,14 @@ pub fn integrate(state: &mut LinearState, t: f64, dt: f64) -> Vector3<f64> {
 	return dxdt * dt;
 }
 
+pub enum Shape {
+	Cube(f32, f32, f32),
+	Sphere(f32),
+}
+
+pub struct Object {
+	pub node: SceneNode,
+	pub lstate: LinearState,
+	pub shape: Shape,
+	pub immovable: bool,
+}
