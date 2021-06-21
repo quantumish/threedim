@@ -11,15 +11,18 @@ use std::path::Path;
 
 use wasm_bindgen::prelude::*;
 
+const dt: f64 = 0.001;
 
 struct AppState {
     cube: SceneNode,
-    vel: Translation3<f32>,	
+    state: LinearState,
+	t: f64,	
 }
 
 impl State for AppState {
     fn step(&mut self, w: &mut Window) {
-        self.cube.prepend_to_local_translation(&self.vel);
+		let vec = integrate(&mut self.state, self.t, dt);
+        self.cube.prepend_to_local_translation(&Translation3::new(vec.x as f32, vec.y as f32, vec.z as f32));
     }
 }
 
@@ -33,8 +36,15 @@ pub fn main() {
     window.set_light(Light::StickToCamera);
 	window.set_background_color(17.0/255.0, 19.0/255.0, 19.0/255.0);
 
-    let v: Translation3<f32> = Translation3::new(0.0, -0.001, 0.0); 
-    let state = AppState { cube: c, vel: v };
+    let v: Translation3<f32> = Translation3::new(0.0, -0.001, 0.0);
+	let s = LinearState {
+		position: Vector3::new(0.0, 0.0, 0.0),
+		velocity: Vector3::new(0.0, 0.0, 0.0),
+		momentum: Vector3::new(0.0, -0.01, 0.0),
+		mass: 1.0,
+		inv_mass: 1.0,
+	};
+    let state = AppState { cube: c, state: s, t: 0.0 };
 
     window.render_loop(state)
 }
