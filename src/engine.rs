@@ -14,6 +14,11 @@ impl LinearState {
 	fn recalculate(&mut self) {
 		self.velocity = self.momentum * self.inv_mass;
 	}
+	
+	fn force(&self, t: f64) -> Vector3<f64> {
+		return Vector3::new(0.0, -9.8, 0.0);
+	}
+
 }
 
 pub struct LinearDerivative {
@@ -29,10 +34,6 @@ struct RotDerivative {
 	
 }
 
-pub fn acceleration(state: &LinearState, t: f64) -> Vector3<f64> {
-	return Vector3::new(0.0, -9.8, 0.0);
-}
-
 pub fn eval(initial: &LinearState, t: f64, dt: f64, d: &LinearDerivative) -> LinearDerivative {
 	let mut state: LinearState = initial.clone();
 	state.position = initial.position + d.velocity * dt;
@@ -41,7 +42,7 @@ pub fn eval(initial: &LinearState, t: f64, dt: f64, d: &LinearDerivative) -> Lin
 
 	let out: LinearDerivative = LinearDerivative {
 		velocity: state.velocity,
-		force: acceleration(&state, t+dt) * state.mass,
+		force: initial.force(t+dt),
 	};
 	return out;
 }
@@ -64,11 +65,13 @@ pub fn integrate(state: &mut LinearState, t: f64, dt: f64) -> Vector3<f64> {
 	return dxdt * dt;
 }
 
+#[derive(Clone, Copy)]
 pub enum Shape {
-	Cube(f32, f32, f32),
-	Sphere(f32),
+	Cube(Vector3<f64>),
+	// Sphere(f32),
 }
 
+#[derive(Clone)]
 pub struct Object {
 	pub node: SceneNode,
 	pub lstate: LinearState,
