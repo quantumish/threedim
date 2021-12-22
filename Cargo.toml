@@ -12,3 +12,4 @@ crate-type = ["cdylib"]
 [dependencies]
 wasm-bindgen = "0.2"
 kiss3d = "0.29"
+float-ord = "0.3.2"
